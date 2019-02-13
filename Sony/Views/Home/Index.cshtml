@@ -1,0 +1,211 @@
+﻿@model IEnumerable<Sony.Core.Models.Item>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="col-md-12">
+    <br />
+    <br />
+    <div class="col-md-12" style="float:left">
+        @foreach (var item in Model.Where(x => x.ItemTypeId == 1))
+        {
+            <div class="col-md-2">
+                <button class="col-md-12 row" onclick="whenModalOpens('@item.Name','@item.IsAvailable', '@item.Id')" style="border:2px solid gray; border-radius:10px; margin-bottom:20px;padding-bottom:20px; background:white;" data-toggle="modal" data-target="#exampleModal">
+                    <h4>@item.Name</h4>
+                    @if (!item.IsAvailable)
+                    {
+                        <img id="img_@item.Id" src="~/images/red.png" style="width:100%" />
+                    }
+                    else
+                    {
+                        <img id="img_@item.Id" src="~/images/green.png" style="width:100%" />
+                    }
+                </button>
+            </div>
+
+        }
+    </div>
+
+    <div class="col-md-12" style="float:left">
+        <hr />
+        <br />
+        @foreach (var item in Model.Where(x => x.ItemTypeId == 2))
+        {
+
+            <div class="col-md-2">
+                <button class="col-md-12 row" onclick="whenModalOpens('@item.Name','@item.IsAvailable', '@item.Id')" style="border:2px solid gray; border-radius:10px; margin-bottom:20px;padding-bottom:20px; background:white;" data-toggle="modal" data-target="#exampleModal">
+                    <h4>@item.Name</h4>
+                    @if (!item.IsAvailable)
+                    {
+                        <img id="img_@item.Id" src="~/images/index.png" style="width:100%" />
+                    }
+                    else
+                    {
+                        <img id="img_@item.Id" src="~/images/picado.png" style="width:100%" />
+
+                    }
+                </button>
+            </div>
+
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="insideModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title pull-left" id="exampleModalLabel"></h3>
+                <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body col-md-12">
+                <div id="notStarted">
+                    @Html.Partial("_StartSony")
+                </div>
+                <div  id="started">
+                    @Html.Partial("_AlreadyStarted")
+                </div>
+            </div>
+
+
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<body onload="startSony();">
+
+</body>
+
+<script>
+    function whenModalOpens(btnName, isAvailable, id) {
+        sessionStorage.setItem('itemId', id);
+
+        $('#exampleModalLabel').text(btnName);
+        if (isAvailable == 'False') {
+            $('#started').css('display', 'block');
+            $('#notStarted').css('display', 'none');
+            $('#insideModal').addClass('modal-lg');
+
+            var itemId = sessionStorage.getItem('itemId');
+            $.ajax({
+                url: "api/invoices/last/" + itemId,
+                method: "get",
+                contentType: "application/json; utf-8",
+                success: function (response) {
+                    response = JSON.parse(response)
+                    $('#hiddenTotal').val(response.CalculateTotalWhileRunning);
+                    if (response == "notFound") {
+                        alert('not found!')
+                    } else {
+                        var dt = new Date(response.StartAt)
+                        var now = new Date();
+                        var difference = now.getTime() - dt.getTime(); // This will give difference in milliseconds
+                        var resultInMinutes = Math.round(difference / 60000);
+                                 
+                        $('#txt2').text(Math.floor(resultInMinutes / 60) + 'h : ' + Math.floor(resultInMinutes % 60) + ' min')
+
+                        $products = JSON.parse(localStorage.getItem('products'));
+                        if ($products != null) {
+                            $('#selectedProducts').html('');
+                            $('#totalPrice').html('');
+
+
+                            $.each($products[response.ItemId - 1], function (i, item) {
+                                $('#selectedProducts').append(`
+                        <tr id="rw_${item.Product.Id}">
+                        <td><h5>${item.Product.Name}</h5></td> 
+                        <td><input type="number" readonly placeholder='Sasia' class="form-control qty" step="0" min="0" max="15" value="${item.Quantity}" /></td>
+                        <td><h5 class="price">${item.Product.CurrentPrice}</h5></td> 
+                        </tr>`)
+                            })
+
+                        } else {
+                          var $products = new Array();
+                          $(function () {
+                          for (var x = 0; x <@Model.Where(x => x.ItemTypeId == 1).Count(); x++) {
+                           $products[x] = new Array();
+                              }
+
+                              localStorage.setItem('products', JSON.stringify($products))
+                          })
+
+                        }
+
+                        calcTotal();
+                    }
+
+                        
+                },
+                error: function (text) {
+                    console.log(text)
+                }
+
+            })
+        }
+        else {
+            $('#started').css('display', 'none');
+            $('#notStarted').css('display', 'block');
+            $('#insideModal').removeClass('modal-lg')
+        }
+
+       
+    }
+
+
+</script>
+
+<script>
+    $('#btnStart').on('click', function () {
+        var itemId = sessionStorage.getItem('itemId');
+        var hasPayed = $('#ddlPayment :selected').val() == 0 ? false : true;
+        var data = {
+            players: $('#ddlPlayers :selected').val(),
+            itemId: itemId,
+            hasPayed: hasPayed,
+        };
+
+        $.ajax({
+            url: "api/invoices/start",
+            method: "post",
+            contentType: "application/json; utf-8",
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response === true) {
+                    location.reload();
+                } else {
+                    alert('Diqka shkoi keq; fatura nuk u inicua')
+                }
+
+            }
+        
+        })
+    })
+</script>
+
+<script>
+ 
+
+    //$(document).ready(function () {
+    //    $.ajax({
+    //        url: "api/invoices/details",    
+    //        method: "get",
+    //        contentType: "application/json; utf-8",
+    //        success: function (response) {
+    //            response = JSON.parse(response)
+    //            $.each(response, function (i, item) {
+    //                $products[item.ItemId - 1] = item.InvoiceDetails;
+    //            })
+
+    //            localStorage.setItem('products', JSON.stringify($products));
+
+    //        }
+
+    //    })
+    //})
+</script>

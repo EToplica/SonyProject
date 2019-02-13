@@ -1,0 +1,119 @@
+﻿@using Sony.Core.Services.Contract; 
+@inject IProductService _productService
+
+
+<div style="overflow-y:scroll" class="col-md-12">
+    <input type="number" hidden id="hiddenTotal" />
+    <div class="row">
+        @foreach (var item in _productService.GetAll())
+        {
+
+            <div class="col-md-4">
+                <button onclick="productAdded('@item.Id','@item.Name','@item.CurrentPrice')" class="btn btn-danger btn-lg col-md-12 row" style="margin-bottom:20px;">
+                    <span>@item.Name </span><br />
+                    <span>@item.CurrentPrice €</span>
+                </button>
+            </div>
+
+
+        }
+    </div>
+
+
+</div>
+
+<script>
+    function productAdded(id, name, price) {
+
+        $row = $('#rw_' + id);
+        $inp = $row.children().find('input');
+        $inp.val(parseInt($inp.val()) + 1);
+
+        $sonyt = JSON.parse(localStorage.getItem('products'))
+
+        var $obj = {
+            ItemId: parseInt(sessionStorage.getItem('itemId')),
+            Quantity: 1,
+            Product: {
+                Id: parseInt(id),
+                Name: name,
+                CurrentPrice: parseFloat(price)
+            }
+
+        }
+
+        if ($row.length > 0) {
+            updateWhenExists($obj.ItemId, id);
+        } else {
+            $('#selectedProducts').append(`
+                        <tr id="rw_${id}">
+                        <td ><h5>${name}</h5></td>
+                        <td><input type="number" readonly placeholder='Sasia' class="form-control qty" step="0" min="0" max="15" value="${1}" /></td>
+                        <td><h5 class="price">${price}</h5></td>
+                        </tr>`)
+
+            updateWhenNotExists($obj);
+        }
+
+        localStorage.clear();
+        localStorage.setItem('products', JSON.stringify($sonyt));
+        calcTotal();
+
+    }
+</script>
+
+<script>
+    function updateWhenNotExists($obj) {
+        $sonyt = JSON.parse(localStorage.getItem('products'))
+        $sonyt[$obj.ItemId - 1].push($obj);
+    }
+
+    function updateWhenExists(itemId, id) {
+        $sonyt = JSON.parse(localStorage.getItem('products'))
+        $.each($sonyt[itemId - 1], function (i, item) {
+            if (item.Product.Id == id) {
+                item.Quantity += 1;
+
+            }
+        })
+    }
+
+    function updateWhenChanges(itemId, id, val) {
+        console.log(itemId)
+        $sonyt = JSON.parse(localStorage.getItem('products'))
+        $.each($sonyt[itemId - 1], function (i, item) {
+            if (item.Product.Id == id) {
+                item.Quantity = val;
+
+            }
+        })
+
+        localStorage.clear();
+        localStorage.setItem('products', JSON.stringify($sonyt));
+    }
+</script>
+<script>
+    function calcTotal() {
+        var total = 0;
+        $('#selectedProducts tr').each(function (i, element) {
+            var html = $(this).html();
+
+            if (html != '') {
+                var qty = $(this).find('.qty').val();
+                var price = parseFloat($(this).find('.price').text());
+                var ttl = qty * price;
+
+                total += ttl;
+            }
+        });
+        var hiddenTotal = parseFloat($('#Artikujt').val());
+        $('#Artikujt').text((total).toFixed(2));
+        var hiddenTotal = parseFloat($('#hiddenTotal').val());
+        $('#totalPrice').text((total + hiddenTotal).toFixed(2));
+
+       
+
+
+    }
+</script>
+

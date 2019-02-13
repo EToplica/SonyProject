@@ -1,0 +1,96 @@
+﻿    @*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@using Sony.Core.Models
+
+<div class="row">
+    <div class="row">
+        <div class="col-md-5" style="float:left">
+            <div class="col-md-4" style="float:left"><h3>Koha: </h3></div>
+            <div class="col-md-8 " style="float:left; color:#d9534f"><h3>  <span class="" id="txt2"></span> </h3></div>
+            <br />
+            <br />
+            <hr />
+
+            <div class="col-md-12">
+                <div class="row ">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-hover table-condensed" id="tab_logic">
+                            <thead>
+                                <tr>
+                                    <th class="text-center col-md-4"> Produkti </th>
+                                    <th class="text-center col-md-4"> Sasia </th>
+                                    <th class="text-center col-md-4"> Cmimi </th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedProducts"></tbody>
+                        </table>
+                        <hr />
+                        <h3>Vetem artikujt: <span id="Artikujt"></span> €</h3>
+                        <h1 style="color:red">Totali: <span id="totalPrice"></span> €</h1>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-7 row" style="float:left;">
+            <h3>Produktet</h3>
+            <hr style="margin-top:13.5px !important" />
+            @Html.Partial("_Products")
+        </div>
+        <hr />
+        <div class="col-md-12">
+            <br />
+            <div class="col-md-12">
+                <button id="btnStop" class="btn btn-lg btn-success btn-group-lg btn-group-justified">NDALO</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    $('#btnStop').on('click',function () {
+        var itemId = parseInt(sessionStorage.getItem('itemId'));
+        $sonyt = JSON.parse(localStorage.getItem('products'))
+        $details = $sonyt[itemId - 1];
+
+        var productDetails = new Array();
+        $.each($details, function (i, item) {
+            var item = {
+                ProductId: item.Product.Id,
+                Quantity: item.Quantity
+            }
+            productDetails.push(item)
+        })
+
+        var data = {
+            itemId: itemId,
+            productDetails: productDetails
+        }
+
+
+        $.ajax({
+            url: "api/invoices/stop",
+            method: "post",
+            data: JSON.stringify(data),
+            contentType: "application/json; utf-8",
+            success: function (response) {
+                if (response === true) {
+                    $sonyt[itemId - 1] = new Array();
+                    localStorage.clear();
+                    localStorage.setItem('products', JSON.stringify($sonyt))
+                    location.reload();
+                } else {
+                    alert('Diqka shkoi keq; fatura nuk u ndal')
+                }
+
+            },
+            error: function (text) {
+                console.log(text)
+            }
+
+        })
+    })
+</script>
+

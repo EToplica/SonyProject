@@ -1,0 +1,48 @@
+﻿@model Sony.Core.Models.Invoice
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Invoice</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Players)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Players)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StartAt)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StartAt)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EndAt)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EndAt)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InsertedBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InsertedBy.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Item)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Item.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

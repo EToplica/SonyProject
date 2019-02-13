@@ -1,0 +1,40 @@
+﻿@model Sony.Core.Models.Product
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<hr />
+
+<h3>A jeni te sigurt qe doni ta fshini kete produkt?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            Cmimi Aktual
+            @*@Html.DisplayNameFor(model => model.CurrentPrice)*@
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CurrentPrice)
+        </dd>
+        <dt>
+            Sasia
+            @*@Html.DisplayNameFor(model => model.StockQuantity)*@
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StockQuantity)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Fshij" class="btn btn-default" /> |
+        <a asp-action="Index">Kthehu tek lista e produkteve</a>
+    </form>
+</div>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Sony.Core.Models.Item>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<hr />
+
+<p>
+    <a asp-action="Create"  class="btn btn-success">Shto Soni&Pikado</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    Emri
+                    @*@Html.DisplayNameFor(model => model.Name)*@
+                </th>
+                <th>
+                    E Lire
+                    @*@Html.DisplayNameFor(model => model.IsAvailable)*@
+                </th>
+            <th>
+                Lloji
+                @*@Html.DisplayNameFor(model => model.ItemType)*@
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsAvailable)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemType.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Permirso</a> |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

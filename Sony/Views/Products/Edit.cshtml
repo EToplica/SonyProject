@@ -1,0 +1,41 @@
+﻿@model Sony.Core.Models.Product
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrentPrice" class="control-label">Cmimi Aktual</label>
+                <input asp-for="CurrentPrice" class="form-control" />
+                <span asp-validation-for="CurrentPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockQuantity" class="control-label">Sasia</label>
+                <input asp-for="StockQuantity" class="form-control" />
+                <span asp-validation-for="StockQuantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Ruaj" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Kthehu tek lista e produkteve</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
